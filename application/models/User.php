@@ -163,6 +163,9 @@ class User extends DbRecord{
     public function uploadFile(){
         $uploadDir = __DIR__.'/../../files/';
         $uFile = $_FILES['User'];
+        if($_FILES['file']['error'] == 4){
+            return true;
+        }
 
         $path_info = pathinfo($uFile['name']['file']);
         $ext = strtolower($path_info['extension']);
