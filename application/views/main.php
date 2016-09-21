@@ -3,6 +3,15 @@
  * @var $this  Controller
  */
 
+
+$language = App::getLanguage();
+$text = 'English';
+if($language == 'en'){
+    $text = 'Русский';
+    $formName = 'Регистрация';
+} else{
+    $formName = 'Registration';
+}
 ?>
 <!DOCTYPE html>
 
@@ -44,9 +53,19 @@
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a class="navbar-brand" href="/"> Тестовое задание</a>
+                <a class="navbar-brand" href="/">Тестовое задание</a>
             </div>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="/site/language" role="button"><?= $text; ?></a>
+                </li>
+            </ul>
         </div>
+
+
+        <!-- Small button group -->
+
     </nav>
     <?php include 'application/views/'.$template.'.php'; ?>
 
