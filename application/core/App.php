@@ -1,5 +1,10 @@
 <? class App{
 
+    const SecondInDay = 86400;
+
+    /**
+     *
+     */
     public static function start(){
         $baseDir = __DIR__.'/../../application/';
 
@@ -18,7 +23,7 @@
             $actionName = $routes[2];
         }
 
-        if($controllerName == 'index.php'){
+        if($controllerName === 'index.php'){
             header('Location: /', true, 302);
         }
         $model = ucfirst($controllerName);
@@ -60,10 +65,13 @@
         }
     }
 
+    /**
+     * @return string
+     */
     public static function getLanguage(){
         $language = 'ru';
         if(isset($_COOKIE['language'])){
-            if($_COOKIE['language'] == 'en'){
+            if($_COOKIE['language'] === 'en'){
                 $language = 'en';
             }
         }
