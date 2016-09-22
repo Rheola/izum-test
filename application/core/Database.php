@@ -24,9 +24,8 @@ class Database{
      * Database constructor.
      */
     protected function __construct(){
-        $connect_string = sprintf('sqlite:%s/../../application/database/database.db', __DIR__);
+        $connect_string = sprintf('sqlite:%s/../database/database.db', __DIR__);
         $this->pdo = new PDO($connect_string);
-
     }
 
 
