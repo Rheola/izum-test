@@ -12,9 +12,7 @@ class UserController extends Controller{
             $model->creation_date = date('Y-m-d H:i:s', time());
 
             if($model->validate()){
-                if(!$model->save()){
-                    $model->addError('Ошибка записи в базу данных');
-                } else{
+                if($model->save()){
                     if(isset($_FILES['User'])){
                         if(!$model->uploadFile()){
                             throw new ErrorException('Ошибка загрузки файла');

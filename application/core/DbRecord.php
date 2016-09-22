@@ -175,6 +175,10 @@ abstract class DbRecord{
             if($result){
                 $this->_isNewRecord = false;
             }
+            if($result === false){
+                $err = 'Ошибка записи в базу данных '.serialize($db->pdo->errorInfo());
+                $this->addError($err);
+            }
 
             return $result;
 
