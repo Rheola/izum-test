@@ -122,6 +122,37 @@ class User extends DbRecord{
         }
     }
 
+    /**
+     * @param $attribute
+     */
+    private function unique($attribute){
+        $this->$attribute = strtolower($this->$attribute);
+        $user = User::findOneByAttribute(__CLASS__, $attribute, $this->$attribute);
+        if($user !== null){
+            $message = 'Поле <b>%s</b>  - %s уже занят.';
+            if(App::getLanguage() === 'en'){
+                $message = 'Field <b>%s</b> %s has already been taken.';
+            }
+            $this->addError(sprintf($message, $this->getLabel($attribute), $this->$attribute));
+        }
+    }
+
+    /**
+     * @param $attribute
+     * @param $regexp
+     * @param $format
+     */
+    private function match($attribute, $regexp, $format){
+        $matches = [];
+        preg_match($regexp, $this->$attribute, $matches);
+        if(count($matches) == 0){
+            $message = 'Неверный формат поля <b>%s</b>  - %s. Пример %s';
+            if(App::getLanguage() === 'en'){
+                $message = 'Field <b>%s</b> %s is not a valid format. Good %s';
+            }
+            $this->addError(sprintf($message, $this->getLabel($attribute), $this->$attribute, $format));
+        }
+    }
 
     /**
      * @return bool
@@ -135,6 +166,9 @@ class User extends DbRecord{
         $this->maxLengthValidator('name', 50);
         $this->maxLengthValidator('phone', 11);
         $this->minLengthValidator('phone', 11);
+        $this->unique('phone');
+        $this->unique('email');
+        $this->match('phone', '/^[78]\d{10}$/', '79871234567');
 
 
         if(isset($_FILES['User'])){
@@ -163,7 +197,8 @@ class User extends DbRecord{
     public function uploadFile(){
         $uploadDir = __DIR__.'/../../files/';
         $uFile = $_FILES['User'];
-        if($_FILES['file']['error'] == 4){
+
+        if($uFile['error']['file'] == 4){
             return true;
         }
 
