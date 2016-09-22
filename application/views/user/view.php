@@ -31,6 +31,18 @@
             <td><?= $model->getLabel('creation_date') ?></td>
             <td><?= $model->creation_date; ?></td>
         </tr>
+        <?
+        if($model->file_name !== null){
+            ?>
+            <tr>
+                <td></td>
+                <td>
+                    <img src="/files/<?= $model->file_name; ?>" alt="">
+                </td>
+            </tr>
+            <?
+        }
+        ?>
         </tbody>
     </table>
 </div>
