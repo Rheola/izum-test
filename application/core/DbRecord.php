@@ -61,14 +61,71 @@ abstract class DbRecord{
         return $this->_isNewRecord;
     }
 
+
+    /**
+     * @param $className
+     * @param $param
+     * @param $val
+     * @return DbRecord|null
+     */
+    public function findOneByAttribute($className, $param, $val){
+
+        /** @var DbRecord $model */
+        $model = new $className;
+
+        $db = Database::getInstance();
+        switch(gettype($val)){
+            case 'NULL':
+                $value = 'NULL';
+                break;
+            case 'boolean':
+                $value = ($val ? '1' : '0');
+                break;
+            case 'integer':
+            case 'double':
+            case 'string':
+                $value = $db->fn_quote($param, $val);
+                break;
+            default:
+                $value = $db->fn_quote($param,serialize($val));
+        }
+
+        $rawData = $db->selectAll($model::tableName(),
+            ['where' => sprintf('%s = %s', $param, $value)]
+        );
+
+        if($rawData === null){
+            return null;
+        }
+
+        if(count($rawData) == 0){
+            return null;
+        }
+
+        $data = [];
+
+        foreach($rawData as $item){
+            $model->_isNewRecord = false;
+            foreach($item as $field => $value){
+                $model->$field = $value;
+            }
+            $data[] = $model;
+        }
+        if(count($data) > 0){
+            return $data[0];
+        }
+
+        return null;
+    }
+
     /**
      * @param $id
      * @return User
      */
-    public static function findOne($id){
+    public static function findByPk($id){
         $db = Database::getInstance();
         $rawData = $db->selectAll(self::tableName(),
-            ['where' => 'id = '.$id]
+            ['where' => sprintf('id = %d', (int)$id)]
         );
         if($rawData === null){
             return null;
@@ -102,7 +159,6 @@ abstract class DbRecord{
         $fields = [];
 
         if($this->isNewRecord()){
-            $this->creation_date = date('Y-m-d H:i:s', time());
             foreach($this as $key => $value){
                 $fields[$key] = $value;
             }
