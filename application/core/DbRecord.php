@@ -87,7 +87,7 @@ abstract class DbRecord{
                 $value = $db->fn_quote($param, $val);
                 break;
             default:
-                $value = $db->fn_quote($param,serialize($val));
+                $value = $db->fn_quote($param, serialize($val));
         }
 
         $rawData = $db->selectAll($model::tableName(),
@@ -118,15 +118,22 @@ abstract class DbRecord{
         return null;
     }
 
+
     /**
      * @param $id
-     * @return User
+     * @return mixed|null
      */
     public static function findByPk($id){
+
+        $class = get_called_class();
+        /** @var DbRecord $model */
+        $model = new $class;
+
         $db = Database::getInstance();
-        $rawData = $db->selectAll(self::tableName(),
+        $rawData = $db->selectAll($model->tableName(),
             ['where' => sprintf('id = %d', (int)$id)]
         );
+
         if($rawData === null){
             return null;
         }
@@ -137,7 +144,6 @@ abstract class DbRecord{
 
         $data = [];
         foreach($rawData as $item){
-            $model = new User();
             $model->_isNewRecord = false;
             foreach($item as $field => $value){
                 $model->$field = $value;
