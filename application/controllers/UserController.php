@@ -17,11 +17,11 @@ class UserController extends Controller{
                 } else{
                     if(isset($_FILES['User'])){
                         if(!$model->uploadFile()){
-                            throw  new ErrorException('Ошибка загрузки файла');
+                            throw new ErrorException('Ошибка загрузки файла');
                         }
                         $model->save();
                     }
-                    header('Location: '.'index', true, 302);
+                    header('Location: '.'view?id='.$model->id, true);
                 }
             }
         }
