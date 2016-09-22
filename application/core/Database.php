@@ -1,11 +1,17 @@
 <?php
 
 
+/**
+ * Class Database
+ */
 class Database{
 
     public $pdo;
     private static $_instance;
 
+    /**
+     * @return Database
+     */
     public static function getInstance(){
         if(!self::$_instance){
             self::$_instance = new Database();
@@ -14,6 +20,9 @@ class Database{
         return self::$_instance;
     }
 
+    /**
+     * Database constructor.
+     */
     protected function __construct(){
         $connect_string = sprintf('sqlite:%s/../../application/database/database.db', __DIR__);
         $this->pdo = new PDO($connect_string);
@@ -24,9 +33,9 @@ class Database{
     /**
      * @param $table
      * @param array $params
-     * @return array
+     * @return array|null
      */
-    public function selectAll($table, $params = []){
+    public function selectAll($table, array $params = []){
         $where = null;
         if(isset($params['where'])){
             $where = $params['where'];
@@ -44,9 +53,15 @@ class Database{
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * @param $table
+     * @param $where
+     * @param $order
+     * @return string
+     */
     protected function select_context($table, $where, $order){
-        $text = 'SELECT * FROM '.$table;
-        if($where != null){
+        $text = sprintf('SELECT * FROM %s', $table);
+        if($where !== null){
             $text .= ' where '.$where;
         }
         if($order !== null){
@@ -56,12 +71,13 @@ class Database{
         return $text;
     }
 
+
     /**
      * @param $table
-     * @param $data
+     * @param array $data
      * @return int
      */
-    public function insert($table, $data){
+    public function insert($table, array $data){
         $columns = [];
         $values = [];
         foreach($data as $key => $value){
@@ -96,7 +112,13 @@ class Database{
         return $this->pdo->exec($query);
     }
 
-    public function update($table, $id, $params){
+    /**
+     * @param $table
+     * @param $id
+     * @param array $params
+     * @return int
+     */
+    public function update($table, $id, array $params){
         $data = [];
         foreach($params as $key => $value){
             if(strpos($key, '_') === 0){
@@ -128,12 +150,17 @@ class Database{
 
         $fields = implode(', ', $data);
 
-        $query = sprintf('update %s  set %s where id=%d', $table, $fields, $id);
+        $query = sprintf('update %s  set %s where id=%d', $table, $fields, (int)$id);
 
         return $this->pdo->exec($query);
     }
 
-    protected function fn_quote($column, $string){
+    /**
+     * @param $column
+     * @param $string
+     * @return string
+     */
+    public function fn_quote($column, $string){
         return (strpos($column, '#') === 0 && preg_match('/^[A-Z0-9\_]*\([^)]*\)$/', $string)) ?
             $string :
             $this->pdo->quote($string);
