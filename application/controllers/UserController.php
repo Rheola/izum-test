@@ -1,7 +1,6 @@
 <?php
 
 class UserController extends Controller{
-
     public function actionIndex(){
         $model = new User();
         if(isset($_POST['User'])){
@@ -9,6 +8,9 @@ class UserController extends Controller{
             $model->email = $post['email'];
             $model->name = $post['name'];
             $model->phone = $post['phone'];
+            $model->email = trim(strtolower($model->email));
+            $model->creation_date = date('Y-m-d H:i:s', time());
+
             if($model->validate()){
                 if(!$model->save()){
                     $model->addError('Ошибка записи в базу данных');
@@ -24,5 +26,18 @@ class UserController extends Controller{
             }
         }
         $this->render('index', ['model' => $model]);
+    }
+
+    public function actionView(){
+        if(!isset($_GET['id'])){
+            throw new ErrorException('Ошибочный запрос', 400);
+        }
+        $id = (int)$_GET['id'];
+        /** @var User $user */
+        $user = User::findByPk($id);
+        if($user === null){
+            throw new ErrorException('Запись не найдена', 404);
+        }
+        $this->render('view', ['model' => $user]);
     }
 }
